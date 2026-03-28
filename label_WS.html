@@ -129,35 +129,39 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbxt170YuiadMqiUZCY13cQ_TWQ_PUKikqz1rBJxHwHsL5Vz6jfTjtB3N0fcEufiyNu8/exec';
   let rawData = null;
 
- document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const hnValue = urlParams.get('hn') || urlParams.get('row');
-    const dateValue = urlParams.get('date'); // ดึงวันที่จาก URL
+    const hnValue = urlParams.get('hn');
+    const dateValue = urlParams.get('date');
 
     if (hnValue) {
-      try {
-        // สร้าง URL สำหรับเรียก API
-        let fetchUrl = `${API_URL}?action=getLastOrder&hn=${encodeURIComponent(hnValue)}`;
+        // อัปเดตข้อความบนหน้าจอให้ User ทราบว่ากำลังดึง HN อะไร
+        document.getElementById('display-info').innerText = `กำลังดึงข้อมูล HN: ${hnValue}...`;
         
-        // ถ้ามีวันที่ส่งมาด้วย ให้เปลี่ยน action หรือส่ง date ไปกำกับ (ขึ้นอยู่กับ API ของคุณขิม)
-        // สมมติว่า API รองรับการส่ง date ไปเพื่อค้นหาออเดอร์เก่า
-        if (dateValue) {
-            fetchUrl += `&date=${encodeURIComponent(dateValue)}`;
-        }
+        try {
+            // สำคัญ: ต้องใส่ date เข้าไปใน fetch ด้วยเพื่อให้ Script กรองวันที่ 28 ได้ถูกต้อง
+            let fetchUrl = `${API_URL}?action=getLastOrder&hn=${encodeURIComponent(hnValue)}`;
+            if (dateValue) {
+                fetchUrl += `&date=${encodeURIComponent(dateValue)}`;
+            }
 
-        const res = await fetch(fetchUrl);
-        rawData = await res.json();
-        
-        if (rawData) {
-          document.getElementById('display-info').innerText = `${rawData.hn} - ${rawData.patient_name}`;
-          renderAll();
+            const res = await fetch(fetchUrl);
+            rawData = await res.json();
+            
+            if (rawData && rawData !== null) {
+                document.getElementById('display-info').innerText = `${rawData.hn} - ${rawData.patient_name}`;
+                renderAll(); // สั่งวาดฉลากและ Worksheet
+                selectSection('pn'); // บังคับให้แสดงส่วน PN Label เป็นอันแรก
+            } else {
+                document.getElementById('display-info').innerText = "❌ ไม่พบข้อมูล Order ของวันที่ระบุ";
+                alert("ไม่พบข้อมูล Order ของวันที่ระบุในระบบค่ะ");
+            }
+        } catch (e) { 
+            document.getElementById('display-info').innerText = "⚠️ เชื่อมต่อฐานข้อมูลไม่ได้";
+            console.error(e);
         }
-      } catch (e) { 
-          document.getElementById('display-info').innerText = "เชื่อมต่อไม่ได้"; 
-      }
     }
 });
-
   function selectSection(type) {
     document.querySelectorAll('.print-area').forEach(el => el.classList.remove('active'));
     document.getElementById(`${type}-area`).classList.add('active');
