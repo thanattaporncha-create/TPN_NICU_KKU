@@ -1684,50 +1684,38 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
 // ========== ฟังก์ชันย่อยที่ต้องปรับตาม BW Factor ==========
 
 function calculateProteinLogic(source) {
-    // 1. ดึงน้ำหนักมาเตรียมไว้ (ลำดับความสำคัญ: bwFactor > bw)
     const bw = parseFloat(document.getElementById('bw').value) || 0;
     const bwFactor = parseFloat(document.getElementById('bwFactor').value) || bw;
     
-    // 2. ดึงความเข้มข้นสินค้า
     const selectedProduct = document.querySelector('input[name="proteinProduct"]:checked').value;
     const pConc = (selectedProduct === 'aminoplasmal') ? 0.15 : 0.10;
+    const activeEl = document.activeElement.id;
 
-    // 3. ดึงค่าจากหน้าจอ
     let pDose = parseFloat(document.getElementById('proteinTarget').value) || 0;
     let pGrams = parseFloat(document.getElementById('proteinGrams').value) || 0;
     let pVol = parseFloat(document.getElementById('proteinVolInput').value) || 0;
 
-    // 4. คำนวณ Logic ขาไป-ขากลับ
-    if (source === 'prot_dose') { 
-        pGrams = pDose * bwFactor; 
-        pVol = pGrams / pConc; 
-    }
-    else if (source === 'prot_grams') { 
-        pDose = bwFactor > 0 ? pGrams / bwFactor : 0; 
-        pVol = pGrams / pConc; 
-    }
-    else if (source === 'prot_vol') { 
-        // --- พาร์ทที่คุณ Khym ต้องการ: ใส่ ml แล้วให้เด้งกลับ ---
-        pGrams = pVol * pConc; 
-        pDose = bwFactor > 0 ? pGrams / bwFactor : 0; 
+    if (source === 'prot_dose') {
+        pGrams = pDose * bwFactor;
+        pVol = pGrams / pConc;
+    } else if (source === 'prot_grams') {
+        pDose = bwFactor > 0 ? pGrams / bwFactor : 0;
+        pVol = pGrams / pConc;
+    } else if (source === 'prot_vol') {
+        pGrams = pVol * pConc;
+        pDose = bwFactor > 0 ? pGrams / bwFactor : 0;
     }
 
-    // 5. บังคับเขียนค่ากลับลงไปใน Input (ยกเว้นช่องที่กำลังพิมพ์อยู่)
-    const activeId = document.activeElement.id;
-
-    if (activeId !== 'proteinTarget') {
-        document.getElementById('proteinTarget').value = pDose > 0 ? roundToPlace(pDose, 1) : 0;
-    }
-    if (activeId !== 'proteinGrams') {
+    if (activeEl !== 'proteinTarget')
+        document.getElementById('proteinTarget').value = pDose > 0 ? roundToPlace(pDose, 2) : 0;
+    if (activeEl !== 'proteinGrams')
         document.getElementById('proteinGrams').value = pGrams > 0 ? roundToPlace(pGrams, 2) : 0;
-    }
-    if (activeId !== 'proteinVolInput') {
+    if (activeEl !== 'proteinVolInput')
         document.getElementById('proteinVolInput').value = pVol > 0 ? roundToPlace(pVol, 1) : 0;
-    }
 
-    // 6. รันคำนวณภาพรวม (รวมถึง GIR และ Rate ใหม่ด้วย)
     calculateAll();
 }
+
 // หมายเหตุ: FatLogic ใช้ bw เดิม ไม่ต้องแก้ตามสั่งแพทย์
 
     // ========== calculateFatAdmin ==========
@@ -1945,26 +1933,6 @@ function calculateFatAdmin() {
             document.getElementById('fatTarget').value = roundToPlace(fTarget, 1);
         }
         document.getElementById('netFat').value = roundToPlace(netFat, 1);
-        calculateAll();
-    }
-
-    function calculateProteinLogic(source) {
-       const bwFactor = parseFloat(document.getElementById('bwFactor').value) || parseFloat(document.getElementById('bw').value) || 0;
-        const selectedProduct = document.querySelector('input[name="proteinProduct"]:checked').value;
-        const activeEl = document.activeElement.id;
-        const pConc = (selectedProduct === 'aminoplasmal') ? 0.15 : 0.10;
-
-        let pDose = parseFloat(document.getElementById('proteinTarget').value) || 0;
-        let pGrams = parseFloat(document.getElementById('proteinGrams').value) || 0;
-        let pVol = parseFloat(document.getElementById('proteinVolInput').value) || 0;
-
-        if (source === 'prot_dose') { pGrams = pDose * bwFactor; pVol = pGrams / pConc; }
-        else if (source === 'prot_grams') { pDose = bw > 0 ? pGrams / bw : 0; pVol = pGrams / pConc; }
-        else if (source === 'prot_vol') { pGrams = pVol * pConc; pDose = bw > 0 ? pGrams / bw : 0; }
-
-        if (activeEl !== 'proteinTarget') document.getElementById('proteinTarget').value = roundToPlace(pDose, 1);
-        if (activeEl !== 'proteinGrams') document.getElementById('proteinGrams').value = roundToPlace(pGrams, 2);
-        if (activeEl !== 'proteinVolInput') document.getElementById('proteinVolInput').value = roundToPlace(pVol, 1);
         calculateAll();
     }
 
