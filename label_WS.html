@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const rowIndex = urlParams.get('row'); // รับค่าเลขแถว
 
     if (rowIndex) {
-        document.getElementById('display-info').innerText = "⏳ กำลังโหลดข้อมูลจากแถวที่ " + rowIndex + "...";
+        document.getElementById('display-info').innerText = "⏳ กำลังโหลดข้อมูล...";
         try {
             // เรียกใช้ action ใหม่ getOrderById
             let fetchUrl = `${API_URL}?action=getOrderById&row=${rowIndex}`;
