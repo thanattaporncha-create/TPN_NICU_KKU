@@ -126,31 +126,38 @@
   <div id="ws-area" class="print-area"></div>
 
 <script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbyJQFV58yKeWIm2gnuEqZDufoalWkGcWBiuMPc85v4jvB7UgLyZNnluPhQEVqCLoRQyYw/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwudbxP-IRlRRRIgLnWHDRxNNlmEucjMMgN35F593gorXhS_vL3bKyT7DTYYkmGz8vXdw/exec';
   let rawData = null;
 
-document.addEventListener('DOMContentLoaded', async () => {
+ document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const rowIndex = urlParams.get('row'); // รับค่าเลขแถว
+    const hnValue = urlParams.get('hn') || urlParams.get('row');
+    const dateValue = urlParams.get('date'); // ดึงวันที่จาก URL
 
-    if (rowIndex) {
-        document.getElementById('display-info').innerText = "⏳ กำลังโหลดข้อมูล...";
-        try {
-            // เรียกใช้ action ใหม่ getOrderById
-            let fetchUrl = `${API_URL}?action=getOrderById&row=${rowIndex}`;
-            const res = await fetch(fetchUrl);
-            rawData = await res.json();
-            
-            if (rawData) {
-                document.getElementById('display-info').innerText = `${rawData.hn} - ${rawData.patient_name}`;
-                renderAll();
-                selectSection('pn'); // แสดงฉลากใบแรกอัตโนมัติ
-            }
-        } catch (e) { 
-            document.getElementById('display-info').innerText = "⚠️ ไม่พบข้อมูลในแถวดังกล่าว";
+    if (hnValue) {
+      try {
+        // สร้าง URL สำหรับเรียก API
+        let fetchUrl = `${API_URL}?action=getLastOrder&hn=${encodeURIComponent(hnValue)}`;
+        
+        // ถ้ามีวันที่ส่งมาด้วย ให้เปลี่ยน action หรือส่ง date ไปกำกับ (ขึ้นอยู่กับ API ของคุณขิม)
+        // สมมติว่า API รองรับการส่ง date ไปเพื่อค้นหาออเดอร์เก่า
+        if (dateValue) {
+            fetchUrl += `&date=${encodeURIComponent(dateValue)}`;
         }
+
+        const res = await fetch(fetchUrl);
+        rawData = await res.json();
+        
+        if (rawData) {
+          document.getElementById('display-info').innerText = `${rawData.hn} - ${rawData.patient_name}`;
+          renderAll();
+        }
+      } catch (e) { 
+          document.getElementById('display-info').innerText = "เชื่อมต่อไม่ได้"; 
+      }
     }
 });
+
   function selectSection(type) {
     document.querySelectorAll('.print-area').forEach(el => el.classList.remove('active'));
     document.getElementById(`${type}-area`).classList.add('active');
