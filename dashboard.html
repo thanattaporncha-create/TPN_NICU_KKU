@@ -208,9 +208,11 @@ const orderDateStr = `${y}-${m}-${day}`;
             </div>
 
             <div class="flex lg:flex-col gap-3">
-              <button onclick="window.open('label_WS.html?hn=${order.hn}&date=${orderDateStr}', '_blank')" class="px-8 py-3 bg-slate-900 hover:bg-black text-white rounded-2xl text-sm font-bold shadow-md flex items-center justify-center gap-2">
-                📝 ฉลาก / Worksheet
-              </button>
+             // เปลี่ยนจาก &date=${orderDateStr} เป็น &row=${order.row_index}
+<button onclick="window.open('label_WS.html?hn=${order.hn}&row=${order.row_index}', '_blank')" 
+        class="px-8 py-3 bg-slate-900 hover:bg-black text-white rounded-2xl text-sm font-bold shadow-md flex items-center justify-center gap-2">
+  📝 ฉลาก / Worksheet
+</button>
               <button onclick="deleteOrder('${order.hn}')" class="px-8 py-3 bg-white hover:bg-rose-50 text-rose-600 border-2 border-rose-100 rounded-2xl text-sm font-bold transition-all">
                 🗑️ OFF TPN
               </button>
