@@ -131,34 +131,23 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const hnValue = urlParams.get('hn');
-    const dateValue = urlParams.get('date');
+    const rowIndex = urlParams.get('row'); // รับค่าเลขแถว
 
-    if (hnValue) {
-        // อัปเดตข้อความบนหน้าจอให้ User ทราบว่ากำลังดึง HN อะไร
-        document.getElementById('display-info').innerText = `กำลังดึงข้อมูล HN: ${hnValue}...`;
-        
+    if (rowIndex) {
+        document.getElementById('display-info').innerText = "⏳ กำลังโหลดข้อมูลจากแถวที่ " + rowIndex + "...";
         try {
-            // สำคัญ: ต้องใส่ date เข้าไปใน fetch ด้วยเพื่อให้ Script กรองวันที่ 28 ได้ถูกต้อง
-            let fetchUrl = `${API_URL}?action=getLastOrder&hn=${encodeURIComponent(hnValue)}`;
-            if (dateValue) {
-                fetchUrl += `&date=${encodeURIComponent(dateValue)}`;
-            }
-
+            // เรียกใช้ action ใหม่ getOrderById
+            let fetchUrl = `${API_URL}?action=getOrderById&row=${rowIndex}`;
             const res = await fetch(fetchUrl);
             rawData = await res.json();
             
-            if (rawData && rawData !== null) {
+            if (rawData) {
                 document.getElementById('display-info').innerText = `${rawData.hn} - ${rawData.patient_name}`;
-                renderAll(); // สั่งวาดฉลากและ Worksheet
-                selectSection('pn'); // บังคับให้แสดงส่วน PN Label เป็นอันแรก
-            } else {
-                document.getElementById('display-info').innerText = "❌ ไม่พบข้อมูล Order ของวันที่ระบุ";
-                alert("ไม่พบข้อมูล Order ของวันที่ระบุในระบบค่ะ");
+                renderAll();
+                selectSection('pn'); // แสดงฉลากใบแรกอัตโนมัติ
             }
         } catch (e) { 
-            document.getElementById('display-info').innerText = "⚠️ เชื่อมต่อฐานข้อมูลไม่ได้";
-            console.error(e);
+            document.getElementById('display-info').innerText = "⚠️ ไม่พบข้อมูลในแถวดังกล่าว";
         }
     }
 });
