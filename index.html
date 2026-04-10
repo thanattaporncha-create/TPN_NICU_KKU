@@ -1650,9 +1650,9 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
     const osmol_Dex = (prepDextroseVol * 2.5 * 1000) / prepVol;
     const osmol_Na = (naSource === 'NaAcetate') ? (naVolume * 6000) / prepVol : (naVolume * 1000) / prepVol;
     const osmol_K = (kSource === 'KAcetate') ? (kVolume * 6000) / prepVol : (kVolume * 4000) / prepVol;
-    const osmol_Ca = (caVolume * 430) / prepVol;
-    const osmol_Mg = (mgVolume * 4000) / prepVol;
-    const osmol_Phos = (phosSource === 'Glycophos') ? (phosVolume * 1000) / prepVol : (phosVolume * 1500) / prepVol;
+    const osmol_Ca = (caVolume * 0.67 * 1000) / prepVol;
+const osmol_Mg = (mgVolume * 4 * 1000) / prepVol;
+const osmol_Phos = (phosSource === 'Glycophos') ? (phosVolume * 2.7 * 1000) / prepVol : (phosVolume * 2 * 1000) / prepVol;
 
     document.getElementById('proteinOsmol').textContent = Math.round(osmol_AA);
     document.getElementById('dextroseOsmol').textContent = Math.round(osmol_Dex);
