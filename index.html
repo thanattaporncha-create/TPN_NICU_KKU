@@ -279,7 +279,19 @@ body {
         padding-bottom: 10px !important;
     }
 }
+/* คลาสสำหรับ Osmol Warning ที่ต้องระวังเป็นพิเศษ */
+.danger-osmol-pulse {
+    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+    border: 4px solid #dc2626 !important;
+    color: #991b1b;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+    animation: pulse-border-red 1.5s infinite;
+}
 
+@keyframes pulse-border-red {
+    0%, 100% { border-color: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.2); }
+    50% { border-color: #ff0000; box-shadow: 0 0 25px rgba(255, 0, 0, 0.5); }
+}
   </style>
 </head>
 <body class="bg-[#ECDD7B]/20">
@@ -584,20 +596,22 @@ body {
         </span>
     </span>
 
+<div class="flex-1 min-w-[130px] flex flex-col">
     <input type="radio" name="proteinProduct" id="aminoven" value="aminoven" class="hidden radio-custom" checked onchange="calculateProteinLogic('prot_dose')">
-    <label for="aminoven" class="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-blue-50">
-        10% Aminoven Infant
-    </label>
-    
+    <label for="aminoven" class="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-blue-50 text-center">10% Aminoven Infant</label>
+    <p class="text-[11px] text-red-600 font-bold mt-1 text-center">นิยม* แรกเกิด - 1 ปี (ใช้ได้ถึง 14 ปี)</p>
+</div>
+
+<div class="flex-1 min-w-[130px] flex flex-col">
     <input type="radio" name="proteinProduct" id="amiparen" value="amiparen" class="hidden radio-custom" onchange="calculateProteinLogic('prot_dose')">
-    <label for="amiparen" class="px-4 py-2 bg-white border-2 border-green-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-green-50">
-        10% Ami-PA-REN
-    </label>
-    
+    <label for="amiparen" class="px-4 py-2 bg-white border-2 border-green-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-green-50 text-center">10% Ami-PA-REN</label>
+    <p class="text-[11px] text-gray-600 font-bold mt-1 text-center">อายุ 1 เดือน - ผู้ใหญ่</p>
+</div>
+
+<div class="flex-1 min-w-[130px] flex flex-col">
     <input type="radio" name="proteinProduct" id="aminoplasmal" value="aminoplasmal" class="hidden radio-custom" onchange="calculateProteinLogic('prot_dose')">
-    <label for="aminoplasmal" class="px-4 py-2 bg-white border-2 border-orange-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-orange-50">
-        15% Amino-plasmal
-    </label>
+    <label for="aminoplasmal" class="px-4 py-2 bg-white border-2 border-orange-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-orange-50 text-center">15% Amino-plasmal</label>
+    <p class="text-[11px] text-gray-600 font-bold mt-1 text-center">อายุ 2 ปี - ผู้ใหญ่</p>
 </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
@@ -809,10 +823,11 @@ body {
             <input type="radio" id="vitSoluvit" name="vitSource" value="Soluvit" checked class="hidden peer" onchange="calculateAll()">
             <label for="vitSoluvit" class="flex items-center justify-center px-2 py-3 border border-gray-300 rounded-lg cursor-pointer text-base font-bold transition-all peer-checked:bg-amber-400 peer-checked:text-black peer-checked:border-amber-600 bg-white text-gray-700">Soluvit-N</label>
           </div>
-          <div class="relative">
-            <input type="radio" id="vitCernevit" name="vitSource" value="Cernevit" class="hidden peer" onchange="calculateAll()">
-            <label for="vitCernevit" class="flex items-center justify-center px-2 py-3 border border-gray-300 rounded-lg cursor-pointer text-base font-bold transition-all peer-checked:bg-pink-600 peer-checked:text-white peer-checked:border-pink-600 bg-white text-gray-700">Cernevit</label>
-          </div>
+         <div class="relative">
+    <input type="radio" id="vitCernevit" name="vitSource" value="Cernevit" class="hidden peer" onchange="calculateAll()">
+    <label for="vitCernevit" id="labelCernevit" class="flex items-center justify-center px-2 py-3 border border-gray-300 rounded-lg cursor-pointer text-base font-bold transition-all peer-checked:bg-pink-600 peer-checked:text-white peer-checked:border-pink-600 bg-white text-gray-700">Cernevit</label>
+    <p id="cernevitLockMsg" class="hidden text-[10px] text-red-600 font-bold mt-1 text-center leading-none">⚠️ ล็อค (มี Vitalipid)</p>
+</div>
         </div>
 
         <div>
@@ -1130,12 +1145,53 @@ body {
     </div>
   </div>
   
-  <div id="osmolWarning" class="hidden mt-4 p-4 warning-box rounded-xl">
-    <div class="flex items-center gap-2 text-amber-800">
-      <span class="text-xl">⚠️</span>
-      <span class="font-medium">Osmolarity สูงเกินไปสำหรับ Peripheral Line (> 900 mOsmol/L) พิจารณาใช้ Central Line</span>
+ <div id="osmolWarning" class="hidden mt-6 p-6 rounded-2xl danger-osmol-pulse">
+    <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-3 text-red-700">
+            <span class="text-4xl animate-bounce">🚨</span>
+            <div>
+                <h3 class="text-xl font-black uppercase tracking-wider">High Osmolarity Alert!</h3>
+                <p class="font-bold text-lg">Osmolarity สูงเกินไปสำหรับ Peripheral Line (ไม่ควรเกิน 900 mOsmol/L)</p>
+            </div>
+        </div>
+
+        <div class="bg-white/80 p-4 rounded-xl border border-red-200 shadow-sm text-gray-800">
+            <p class="font-black text-red-800 mb-2 border-b border-red-200 pb-1 flex items-center gap-2">
+                💡 แนวทางปฏิบัติ/Consult แพทย์:
+            </p>
+            <ul class="space-y-3 text-[15px]">
+                <li class="flex items-start gap-2">
+                    <span class="text-red-600 font-bold">1.</span>
+                    <span><b>เปลี่ยนเส้นทาง:</b> พิจารณาใช้ <b>Central Line</b></span>
+                </li>
+                <li class="flex items-start gap-2 border-t border-red-50 pt-2">
+                    <span class="text-red-600 font-bold">2.</span>
+                    <span><b>ถ้าเปิด Central Line ไม่ได้:</b> แนะนำเพิ่ม <b>Sterile water</b> ใน Bag <br>
+                    <span class="text-red-600 font-bold underline italic">*Note: Total volume และ Rate จะเพิ่มขึ้น, %Glucose จะลดลง ต้องแจ้งแพทย์เพื่อยืนยัน*</span></span>
+                </li>
+                <li class="flex items-start gap-2 border-t border-red-50 pt-2">
+                    <span class="text-red-600 font-bold">3.</span>
+                    <span><b>ถ้าคนไข้จำกัดน้ำ (Fluid Restriction):</b> ปรึกษาแพทย์เพื่อ <b>ลด Amino acid และ/หรือ Glucose</b> ลง เนื่องจากสองตัวนี้มีค่า Osmolarity สูงที่สุด</b></span>
+                </li>
+                <li class="flex items-start gap-3 border-2 border-green-500 pt-3 pb-3 bg-green-50 p-3 rounded-2xl shadow-sm scale-105 transform origin-left transition-all">
+    <span class="text-green-700 font-black text-xl">4.</span>
+    <div>
+        <span class="text-gray-900 font-bold text-lg">เฉพาะกรณี NICU / 2ค:</span> <br>
+        <span class="text-gray-800">ในบางกรณีอาจยอมรับได้สูงถึง</span> 
+        <span style="font-size: 28px; color: #059669; font-weight: 900; line-height: 1;">1400 mOsmol/L</span> 
+        <span class="text-green-800 font-bold">(ไม่ควรเกิน 5 วัน)</span><br>
+        <span class="text-green-700 text-sm font-semibold italic">*หมายเหตุ: ทั้งนี้ขึ้นอยู่กับดุลยพินิจของแพทย์ หากเกิน 1400 mOsmol/ แนะนำโทรConfirm*</span>
     </div>
-  </div>
+</li>
+                <li class="flex items-start gap-2 border-t border-red-50 pt-2 bg-amber-50/50 p-2 rounded-lg">
+                    <span class="text-amber-700 font-bold">5.</span>
+                    <span><b>การบันทึก:</b> หากแพทย์ยืนยันใช้สูตรเดิมใน P-line ให้บันทึกในใบ Order ว่า: <br>
+                    <span class="text-amber-800 font-black">"แพทย์ยืนยันใช้ Osmolarity = <span id="osmolInText">____</span> พร้อมระบุชื่อแพทย์"</span></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
   
       <!-- Save Order Button -->
       <div class="flex gap-2 justify-end mt-10 mb-8">
@@ -1384,20 +1440,20 @@ async function fetchPatientAndHistory() {
 
     // ========== calculateAll ==========
   // ========== ฟังก์ชันคำนวณหลัก calculateAll (ฉบับปรับปรุงตามคำสั่งแพทย์ 2026) ==========
+// ========== ฟังก์ชันคำนวณหลัก calculateAll (ฉบับแก้ไข Error และรวม Logic ทั้งหมด) ==========
 function calculateAll() {
     // ดึงค่าพื้นฐาน
     const bw = parseFloat(document.getElementById('bw').value) || 0;
-    // BW Factor: ถ้าไม่ได้กรอก ให้ใช้น้ำหนักจริง (bw) เป็นค่าเริ่มต้น
     const bwFactor = parseFloat(document.getElementById('bwFactor').value) || bw;
-    
     const totalVolume = parseFloat(document.getElementById('totalVolume').value) || 0;
     const fatTarget = parseFloat(document.getElementById('fatTarget').value) || 0;
     const dextrosePercent = parseFloat(document.getElementById('dextrosePercent').value) || 0;
 
-    // 1. Vitalipid (ใช้ Actual BW ตามเดิม)
+    // 1. Vitalipid
     const vitalipidInput = document.getElementById('vitalipid');
     const vitalipidWarning = document.getElementById('vitalipidMaxWarning');
     const vitalipidFatValue = parseFloat(document.getElementById('vitalipidFatValue').value) || 0;
+    
     if (!isVitalipidManual) {
         let autoVitalipid = bw * 4;
         if (autoVitalipid > 10) autoVitalipid = 10;
@@ -1408,7 +1464,7 @@ function calculateAll() {
     }
     const vitalipidVolume = parseFloat(vitalipidInput.value) || 0;
 
-    // 2. Net Fat (ใช้ Actual BW ตามเดิม)
+    // 2. Net Fat
     let netFat = fatTarget;
     if (document.getElementById('deductVitalipid').checked) {
         netFat = Math.max(0, fatTarget - vitalipidFatValue);
@@ -1437,27 +1493,19 @@ function calculateAll() {
     const pnPrepVol = roundToPlace(pnVolume + pnFlush, 1);
     document.getElementById('pnPrepVolume').value = pnPrepVol;
 
-    // 5. Rate & GIR (ปรับสูตรใหม่ตามสั่งแพทย์)
-   // --- ส่วนของ Rate & GIR ในฟังก์ชัน calculateAll ---
-const rateInput = document.getElementById('rateTPN');
-if (!isRateManual) {
-    // 1. คำนวณ Rate ใหม่ตามสั่งแพทย์: (Vol PN - 10) / 24
-    let newRate = (pnVolume - 10) / 24;
-    rateInput.value = roundToPlace(Math.max(0, newRate), 1);
-}
-const finalRate = parseFloat(rateInput.value) || 0;
+    // 5. Rate & GIR
+    const rateInput = document.getElementById('rateTPN');
+    if (!isRateManual) {
+        let newRate = (pnVolume - 10) / 24;
+        rateInput.value = roundToPlace(Math.max(0, newRate), 1);
+    }
+    const finalRate = parseFloat(rateInput.value) || 0;
+    const gir = bw > 0 ? (finalRate * dextrosePercent) / (bw * 6) : 0;
+    document.getElementById('girValue').textContent = roundToPlace(gir, 2);
+    const girWarnEl = document.getElementById('girWarning');
+    if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
 
-// 2. คำนวณ GIR: ใช้ finalRate (ตัวใหม่) แต่หารด้วย bw (น้ำหนักจริง) ตามที่ Khym ต้องการ
-// สูตร: (Rate * %Dex) / (BW * 6)
-const gir = bw > 0 ? (finalRate * dextrosePercent) / (bw * 6) : 0;
-
-document.getElementById('girValue').textContent = roundToPlace(gir, 2);
-
-// ส่วนการแจ้งเตือน GIR
-const girWarnEl = document.getElementById('girWarning');
-if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
-
-    // 6. Electrolytes (เปลี่ยนไปใช้ bwFactor ทั้งหมด)
+    // 6. Electrolytes
     const phosphorus = parseFloat(document.getElementById('phosphorus').value) || 0;
     const sodium = parseFloat(document.getElementById('sodium').value) || 0;
     const potassium = parseFloat(document.getElementById('potassium').value) || 0;
@@ -1470,16 +1518,13 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
 
     const phosInput = document.getElementById('phosvol');
     if (!isPhosVolManual) {
-        phosInput.value = (phosSource === 'K2HPO4')
-            ? roundToPlace((phosphorus * bwFactor) * 2, 1)
-            : roundToPlace(phosphorus * bwFactor, 1);
+        phosInput.value = (phosSource === 'K2HPO4') ? roundToPlace((phosphorus * bwFactor) * 2, 1) : roundToPlace(phosphorus * bwFactor, 1);
     }
     const phosVolume = parseFloat(phosInput.value) || 0;
 
     let phosNa = 0, kFromPhos = 0;
     const naFromPRow = document.getElementById('naFromP_Row');
     const kFromPRow = document.getElementById('kFromP_Row');
-
     if (phosSource === 'Glycophos') {
         if (naFromPRow) naFromPRow.classList.remove('hidden');
         if (kFromPRow) kFromPRow.classList.add('hidden');
@@ -1496,27 +1541,21 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
 
     const naDivisor = (naSource === 'NaAcetate') ? 3 : 0.5;
     const naInput = document.getElementById('navol');
-    // ใช้ bwFactor
     if (!isNaVolManual) naInput.value = roundToPlace(Math.max(0, (sodium * bwFactor) - phosNa) / naDivisor, 1);
     const naVolume = parseFloat(naInput.value) || 0;
 
     const kDivisor = (kSource === 'KAcetate') ? 3 : 2;
     const kInput = document.getElementById('kvol');
-    if (!isKVolManual) {
-        // ใช้ bwFactor
-        kInput.value = roundToPlace(Math.max(0, (potassium * bwFactor) - kFromPhos) / kDivisor, 1);
-    }
+    if (!isKVolManual) kInput.value = roundToPlace(Math.max(0, (potassium * bwFactor) - kFromPhos) / kDivisor, 1);
     const kVolume = parseFloat(kInput.value) || 0;
 
     const mgInput = document.getElementById('mgvol');
-    // ใช้ bwFactor
     if (!isMgVolManual) mgInput.value = roundToPlace((magnesium * bwFactor) / 2, 2);
     const mgVolume = parseFloat(mgInput.value) || 0;
 
     const caInput = document.getElementById('cavol');
     const caWarning = document.getElementById('caMaxWarning');
     if (!isCaVolManual) {
-        // ใช้ bwFactor
         let autoCaVol = calcium * bwFactor;
         if (autoCaVol > 10) {
             caInput.value = 10;
@@ -1529,26 +1568,38 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
     const caVolume = parseFloat(caInput.value) || 0;
     const electrolytesVolume = phosVolume + naVolume + kVolume + mgVolume + caVolume;
 
-    // 7. Vitamins & Trace (ใช้ bwFactor)
+    // 7. Vitamins & Trace - ล็อค Cernevit Logic
     const vitInput = document.getElementById('vitvol');
+    const vitSoluvitRadio = document.getElementById('vitSoluvit');
+    const vitCernevitRadio = document.getElementById('vitCernevit');
+    const labelCernevit = document.getElementById('labelCernevit');
+    const cernevitLockMsg = document.getElementById('cernevitLockMsg');
+
+    if (vitalipidVolume > 0) {
+        vitCernevitRadio.disabled = true;
+        labelCernevit.classList.add('opacity-50', 'cursor-not-allowed');
+        cernevitLockMsg.classList.remove('hidden');
+        if (vitCernevitRadio.checked) vitSoluvitRadio.checked = true;
+    } else {
+        vitCernevitRadio.disabled = false;
+        labelCernevit.classList.remove('opacity-50', 'cursor-not-allowed');
+        cernevitLockMsg.classList.add('hidden');
+    }
+
     const vitSource = document.querySelector('input[name="vitSource"]:checked')?.value || 'Soluvit';
     if (!isVitVolManual) {
-        vitInput.value = (vitSource === 'Cernevit')
-            ? roundToPlace(Math.min(bwFactor, 5), 1)
-            : roundToPlace(Math.min(bwFactor, 10), 1);
+        vitInput.value = (vitSource === 'Cernevit') ? roundToPlace(Math.min(bwFactor, 5), 1) : roundToPlace(Math.min(bwFactor, 10), 1);
     }
     const vitVolume = parseFloat(vitInput.value) || 0;
 
     const traceInput = document.getElementById('tracevol');
     const traceSource = document.querySelector('input[name="traceSource"]:checked')?.value || 'Peditrace';
     if (!isTraceVolManual) {
-        traceInput.value = (traceSource === 'Addamel')
-            ? roundToPlace(Math.min(bwFactor, 10), 1)
-            : roundToPlace(Math.min(bwFactor, 15), 1);
+        traceInput.value = (traceSource === 'Addamel') ? roundToPlace(Math.min(bwFactor, 10), 1) : roundToPlace(Math.min(bwFactor, 15), 1);
     }
     const traceVolume = parseFloat(traceInput.value) || 0;
 
-    // 8. Additives (ใช้ bwFactor)
+    // 8. Additives
     let zincVolume = 0;
     const zincSelection = document.querySelector('input[name="zinc"]:checked')?.value;
     const zincInput = document.getElementById('zincvol');
@@ -1571,16 +1622,13 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
     if (heparinSelection === 'yes') {
         const hepUnits = roundToPlace(pnVolume, 0);
         heparinVolume = roundToPlace(hepUnits / 500, 2);
-        const hepUnitsEl = document.getElementById('heparinUnits');
-        const hepVolEl = document.getElementById('heparinVolume');
-        if (hepUnitsEl) hepUnitsEl.textContent = hepUnits + " units";
-        if (hepVolEl) hepVolEl.textContent = heparinVolume.toFixed(2) + " ml";
+        if (document.getElementById('heparinUnits')) document.getElementById('heparinUnits').textContent = hepUnits + " units";
+        if (document.getElementById('heparinVolume')) document.getElementById('heparinVolume').textContent = heparinVolume.toFixed(2) + " ml";
         if (hepDiv) hepDiv.classList.remove('hidden');
     } else {
         if (hepDiv) hepDiv.classList.add('hidden');
         heparinVolume = 0;
     }
-
     const otherVol = parseFloat(document.getElementById('additiveOtherVolume').value) || 0;
 
     // 9. Protein & Dextrose
@@ -1589,25 +1637,19 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
 
     // 10. Water
     const allSubstances = proteinVolume + dextroseVolume + electrolytesVolume + vitVolume + traceVolume + zincVolume + otherVol;
-    if (!isWaterManual) {
-        document.getElementById('waterVolInput').value = roundToPlace(pnVolume - allSubstances, 1);
-    }
+    if (!isWaterManual) document.getElementById('waterVolInput').value = roundToPlace(pnVolume - allSubstances, 1);
 
-    // 11. Update Table Names
+    // 11. Update Table
     const selectedProt = document.querySelector('input[name="proteinProduct"]:checked');
-    if (selectedProt) {
-        const protLabel = document.querySelector(`label[for="${selectedProt.id}"]`).textContent;
-        document.getElementById('row-protein-name').textContent = protLabel;
-    }
+    if (selectedProt) document.getElementById('row-protein-name').textContent = document.querySelector(`label[for="${selectedProt.id}"]`).textContent;
     document.getElementById('row-phos-name').textContent = (phosSource === 'Glycophos') ? "- Glycophos (P)" : "- K2HPO4 (P)";
     document.getElementById('row-na-name').textContent = (naSource === 'NaAcetate') ? "- Na Acetate" : "- 3% NaCl (Na)";
     document.getElementById('row-k-name').textContent = (kSource === 'KAcetate') ? "- K Acetate" : "- KCl (K)";
     document.getElementById('row-soluvit-name').textContent = (vitSource === 'Soluvit') ? "- Soluvit N" : "- Cernevit";
     document.getElementById('row-peditrace-name').textContent = (traceSource === 'Peditrace') ? "- Peditrace" : "- Addamel-N";
-    const otherNameInput = document.getElementById('additiveOtherName').value;
-    document.getElementById('row-other-name').textContent = otherNameInput ? "- " + otherNameInput : "- Other Additive";
+    document.getElementById('row-other-name').textContent = document.getElementById('additiveOtherName').value ? "- " + document.getElementById('additiveOtherName').value : "- Other Additive";
 
-    // 12. Update Table Volumes
+    // 12. Volumes & Prep
     document.getElementById('proteinVol').textContent = roundToPlace(proteinVolume, 2);
     document.getElementById('dextroseVol').textContent = roundToPlace(dextroseVolume, 2);
     document.getElementById('row-phos-vol').textContent = phosVolume;
@@ -1621,7 +1663,6 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
     document.getElementById('row-heparin-vol').textContent = roundToPlace(heparinVolume, 2);
     document.getElementById('row-other-vol').textContent = otherVol;
 
-    // 13. Prep Column
     const prepDextroseVol = roundToPlace((dextrosePercent * pnPrepVol * 2) / 100, 2);
     document.getElementById('prep-proteinVol').textContent = roundToPlace(proteinVolume, 2);
     document.getElementById('prep-dextroseVol').textContent = prepDextroseVol;
@@ -1637,11 +1678,9 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
     document.getElementById('prep-other-vol').textContent = otherVol;
 
     const allSubstancesPrep = proteinVolume + prepDextroseVol + electrolytesVolume + vitVolume + traceVolume + zincVolume + otherVol;
-    if (!isPrepWaterManual) {
-        document.getElementById('prep-waterVolInput').value = roundToPlace(pnPrepVol - allSubstancesPrep, 1);
-    }
-    
-    // 14. Osmolarity
+    if (!isPrepWaterManual) document.getElementById('prep-waterVolInput').value = roundToPlace(pnPrepVol - allSubstancesPrep, 1);
+
+    // 14. Osmolarity & Warning
     const prepVol = pnPrepVol || 1;
     const selectedProtProductOsmol = document.querySelector('input[name="proteinProduct"]:checked')?.value || 'aminoplasmal';
     const protConcOsmol = (selectedProtProductOsmol === 'aminoplasmal') ? 0.15 : 0.10;
@@ -1651,8 +1690,8 @@ if (girWarnEl) girWarnEl.classList.toggle('hidden', !(gir > 12));
     const osmol_Na = (naSource === 'NaAcetate') ? (naVolume * 6000) / prepVol : (naVolume * 1000) / prepVol;
     const osmol_K = (kSource === 'KAcetate') ? (kVolume * 6000) / prepVol : (kVolume * 4000) / prepVol;
     const osmol_Ca = (caVolume * 0.67 * 1000) / prepVol;
-const osmol_Mg = (mgVolume * 4 * 1000) / prepVol;
-const osmol_Phos = (phosSource === 'Glycophos') ? (phosVolume * 2.7 * 1000) / prepVol : (phosVolume * 2 * 1000) / prepVol;
+    const osmol_Mg = (mgVolume * 4 * 1000) / prepVol;
+    const osmol_Phos = (phosSource === 'Glycophos') ? (phosVolume * 2.7 * 1000) / prepVol : (phosVolume * 2 * 1000) / prepVol;
 
     document.getElementById('proteinOsmol').textContent = Math.round(osmol_AA);
     document.getElementById('dextroseOsmol').textContent = Math.round(osmol_Dex);
@@ -1668,18 +1707,23 @@ const osmol_Phos = (phosSource === 'Glycophos') ? (phosVolume * 2.7 * 1000) / pr
 
     const currentRoute = document.querySelector('input[name="route"]:checked')?.value;
     const osmolWarnEl = document.getElementById('osmolWarning');
-    if (osmolWarnEl) osmolWarnEl.classList.toggle('hidden', !(currentRoute === 'peripheral' && totalOsmolValue > 900));
+    const osmolInText = document.getElementById('osmolInText');
+
+    if (currentRoute === 'peripheral' && totalOsmolValue > 900) {
+        osmolWarnEl.classList.remove('hidden');
+        if (osmolInText) osmolInText.textContent = Math.round(totalOsmolValue) + " mOsmol/L";
+    } else {
+        osmolWarnEl.classList.add('hidden');
+    }
 
     // 15. Calories
     const pCal = proteinVolume * 0.4;
     const dCal = dextroseVolume * 0.5 * 3.4;
-    const fCal = (parseFloat(document.getElementById('fatVolume').value) || 0) * 2;
-
+    const fCal = fatVolume * 2;
     document.getElementById('proteinCal').textContent = roundToPlace(pCal, 1);
     document.getElementById('dextroseCal').textContent = roundToPlace(dCal, 1);
     document.getElementById('totalPNCal').textContent = roundToPlace(pCal + dCal, 1);
     document.getElementById('totalCalDisplay').textContent = roundToPlace(pCal + dCal + fCal, 1);
-    // แคลอรี่ต่อกิโลกรัม ใช้ Actual BW
     document.getElementById('calPerKg').textContent = bw > 0 ? roundToPlace((pCal + dCal + fCal) / bw, 1) : '0.0';
     document.getElementById('totalPNVol_Summary').textContent = roundToPlace(pnVolume, 1);
     document.getElementById('totalPrepVolDisplay').textContent = roundToPlace(pnPrepVol, 1);
@@ -1688,17 +1732,13 @@ const osmol_Phos = (phosSource === 'Glycophos') ? (phosVolume * 2.7 * 1000) / pr
 
     const caPBtn = document.getElementById('caPCheckBtn');
     if (caPBtn) {
-        const phosSource = document.querySelector('input[name="phosSource"]:checked')?.value;
+        const phosSourceCheck = document.querySelector('input[name="phosSource"]:checked')?.value;
         const caInputVal = parseFloat(document.getElementById('calcium').value) || 0;
-        if (phosSource === 'K2HPO4' && caInputVal > 0) {
+        if (phosSourceCheck === 'K2HPO4' && caInputVal > 0) {
             caPBtn.disabled = false;
-            caPBtn.classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
-            caPBtn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'cursor-pointer');
             caPBtn.style.opacity = "1";
         } else {
             caPBtn.disabled = true;
-            caPBtn.classList.add('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
-            caPBtn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'cursor-pointer');
             caPBtn.style.opacity = "0.5";
         }
     }
@@ -2277,6 +2317,21 @@ function printA4() {
         document.querySelectorAll('input[name="route"]').forEach(radio => {
             radio.addEventListener('change', calculateAll);
         });
+      // --- เริ่มต้นส่วนที่ต้อง "เพิ่ม" ตรงนี้ค่ะ ---
+
+        // ผูกเหตุการณ์การเปลี่ยนวิตามิน/Trace
+        document.querySelectorAll('input[name="vitSource"]').forEach(radio => {
+            radio.addEventListener('change', calculateAll);
+        });
+        document.querySelectorAll('input[name="traceSource"]').forEach(radio => {
+            radio.addEventListener('change', calculateAll);
+        });
+        // ผูกเหตุการณ์การเลือกประเภท Vitalipid (Infant/Adult)
+        document.querySelectorAll('input[name="vitProduct"]').forEach(radio => {
+            radio.addEventListener('change', calculateAll);
+        });
+
+        // --- จบส่วนที่เพิ่ม ---
 
         const pnFlushInput = document.getElementById('pnFlushVolume');
         if (pnFlushInput) {
