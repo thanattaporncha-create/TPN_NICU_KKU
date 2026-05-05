@@ -292,6 +292,13 @@ body {
     0%, 100% { border-color: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.2); }
     50% { border-color: #ff0000; box-shadow: 0 0 25px rgba(255, 0, 0, 0.5); }
 }
+    .zinc-req-btn.active {
+  background-color: #7c3aed !important;
+  border-color: #6d28d9 !important;
+  color: white !important;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.25);
+  transform: scale(1.08);
+}
   </style>
 </head>
 <body class="bg-[#ECDD7B]/20">
@@ -906,7 +913,16 @@ body {
             <span class="text-gray-600 whitespace-nowrap font-medium">ml</span>
           </div>
           <div class="mt-3 space-y-1 border-t border-cyan-200 pt-2">
-            <p class="text-xs font-bold"><span class="text-black">Peditrace = 1ml/kg</span><span class="text-red-600"> หรือ (Zinc req x BW Factor) ÷ 250 mcg (Max 15 ml)</span></p>
+            <p class="text-xs font-bold text-gray-600 mb-1">Zinc req × BW Factor ÷ 250 = Peditrace (ml)</p>
+<div class="flex flex-wrap gap-1.5 mb-1" id="zincReqButtons">
+  <span class="text-xs font-bold text-gray-500 w-full">Zinc req (mcg/kg/day):</span>
+  <button type="button" onclick="setZincReq(50)"  data-zreq="50"  class="zinc-req-btn px-2.5 py-1 rounded-lg border-2 border-gray-300 bg-white text-xs font-bold text-gray-600 hover:bg-blue-50 hover:border-blue-400 transition-all">50</button>
+  <button type="button" onclick="setZincReq(100)" data-zreq="100" class="zinc-req-btn px-2.5 py-1 rounded-lg border-2 border-gray-300 bg-white text-xs font-bold text-gray-600 hover:bg-blue-50 hover:border-blue-400 transition-all">100</button>
+  <button type="button" onclick="setZincReq(200)" data-zreq="200" class="zinc-req-btn px-2.5 py-1 rounded-lg border-2 border-gray-300 bg-white text-xs font-bold text-gray-600 hover:bg-blue-50 hover:border-blue-400 transition-all">200</button>
+  <button type="button" onclick="setZincReq(300)" data-zreq="300" class="zinc-req-btn px-2.5 py-1 rounded-lg border-2 border-gray-300 bg-white text-xs font-bold text-gray-600 hover:bg-blue-50 hover:border-blue-400 transition-all">300</button>
+  <button type="button" onclick="setZincReq(400)" data-zreq="400" class="zinc-req-btn px-2.5 py-1 rounded-lg border-2 border-purple-400 bg-purple-100 text-xs font-black text-purple-700 hover:bg-purple-200 transition-all">400 ★</button>
+</div>
+<p class="text-xs font-bold text-red-600">หรือ Peditrace = 1ml/kg (Max 15ml)</p>
             <p class="text-xs font-bold text-red-600">Addamel-N = 10 ml/day (Max 10 ml)</p>
           </div>
           <p id="traceWarning" class="hidden text-xs text-red-600 mt-1 font-semibold">⚠️ เกินค่าสูงสุด!</p>
@@ -1324,6 +1340,7 @@ function logout() {
     let isPrepWaterManual = false;
     let isPNFlushManual = false;
     let debounceTimer; // เพิ่มตัวแปรนี้ไว้ข้างบนสุดของ script
+  window.currentZincReq = 400; // ค่า default = 400 mcg/kg/day
 
     // รายชื่อหอผู้ป่วย
     const wardList = [
@@ -1691,10 +1708,16 @@ function calculateAll() {
     }
     const vitVolume = parseFloat(vitInput.value) || 0;
 
-    const traceInput = document.getElementById('tracevol');
+   const traceInput = document.getElementById('tracevol');
     const traceSource = document.querySelector('input[name="traceSource"]:checked')?.value || 'Peditrace';
     if (!isTraceVolManual) {
-        traceInput.value = (traceSource === 'Addamel') ? roundToPlace(Math.min(bwFactor, 10), 1) : roundToPlace(Math.min(bwFactor, 15), 1);
+        if (traceSource === 'Addamel') {
+            traceInput.value = roundToPlace(Math.min(bwFactor, 10), 1);
+        } else {
+            const zReq = window.currentZincReq || 400;
+            const autoTrace = (zReq * bwFactor) / 250;
+            traceInput.value = roundToPlace(Math.min(autoTrace, 15), 1);
+        }
     }
     const traceVolume = parseFloat(traceInput.value) || 0;
 
@@ -1971,8 +1994,10 @@ function calculateFatAdmin() {
         isPhosNaManual = false; isNaVolManual = false; isKVolManual = false;
         isMgVolManual = false; isCaVolManual = false; isRateManual = false;
         isVitalipidManual = false; isVitVolManual = false; isTraceVolManual = false;
-        isFlushManual = false; isPhosVolManual = false; isWaterManual = false;
+       isFlushManual = false; isPhosVolManual = false; isWaterManual = false;
         isPrepWaterManual = false; isPNFlushManual = false;
+        currentZincReq = 400; // reset กลับค่า default
+        setZincReq(400);      // อัปเดตสีปุ่มด้วย
 
         document.getElementById('orderDate').valueAsDate = new Date();
         document.getElementById('hn').value = '';
@@ -2074,7 +2099,14 @@ function calculateFatAdmin() {
         isRateManual = true;
         calculateAll();
     }
-
+function setZincReq(val) {
+    window.currentZincReq = val;
+    document.querySelectorAll('.zinc-req-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.zreq) === val);
+    });
+    isTraceVolManual = false;
+    calculateAll();
+}
     function calculateFatLogic(source) {
         const bw = parseFloat(document.getElementById('bw').value) || 0;
         const isDeduct = document.getElementById('deductVitalipid').checked;
@@ -2445,7 +2477,8 @@ function printA4() {
             });
         }
 
-        // 3. รันการคำนวณรอบแรกเพื่อเซตค่าเริ่มต้น
+    // 3. รันการคำนวณรอบแรกเพื่อเซตค่าเริ่มต้น
+        setZincReq(400); // ตั้งค่า default Zinc req = 400
         calculateAll();
     });
 
