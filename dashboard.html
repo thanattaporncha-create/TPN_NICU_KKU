@@ -78,7 +78,7 @@
   </main>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbz9D-YEwPu4UIEgK32GdzTUZf-PfDxIXQNWq9Iwyrp4-_LnQ82B5Rz2B_Uy2aN3irmhNA/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwgMAeiIvWsr3bXy-t3d483kKuhpfaFlF4X4U00QBlIwuAdVN-rhFqeaE1hBf1peW8AFw/exec';
     let allOrders = [];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -163,8 +163,6 @@
 
       container.innerHTML = [...filtered].reverse().map(order => {
         const isCentral = order.route?.toLowerCase().includes('central');
-        
-        // --- ส่วนที่แก้: คำนวณวันที่สำหรับส่งไปหน้าพิมพ์ ---
         const orderDateStr = order.order_date ? order.order_date.toString().split('T')[0] : '';
         
         return `
@@ -206,7 +204,7 @@
               <button onclick="window.open('label_WS.html?hn=${order.hn}&date=${orderDateStr}', '_blank')" class="px-8 py-3 bg-slate-900 hover:bg-black text-white rounded-2xl text-sm font-bold shadow-md flex items-center justify-center gap-2">
                 📝 ฉลาก / Worksheet
               </button>
-              <button onclick="deleteOrder('${order.hn}')" class="px-8 py-3 bg-white hover:bg-rose-50 text-rose-600 border-2 border-rose-100 rounded-2xl text-sm font-bold transition-all">
+              <button onclick="deleteOrder('${order.hn}', '${orderDateStr}')" class="px-8 py-3 bg-white hover:bg-rose-50 text-rose-600 border-2 border-rose-100 rounded-2xl text-sm font-bold transition-all">
                 🗑️ OFF TPN
               </button>
             </div>
@@ -215,8 +213,9 @@
       }).join('');
     }
 
-    async function deleteOrder(hn) {
-      if (!confirm(`⚠️ ยืนยันการสั่ง OFF TPN สำหรับ HN: ${hn} ?`)) return;
+    async function deleteOrder(hn, orderDate) {
+      if (!confirm(`⚠️ ยืนยันการสั่ง OFF TPN สำหรับ HN: ${hn} ของวันที่ ${orderDate} ?`)) return;
+      
       const btn = event.currentTarget;
       const originalText = btn.innerHTML;
       btn.innerHTML = "⏳ กำลังลบ...";
@@ -226,6 +225,8 @@
         const params = new URLSearchParams();
         params.append('action', 'deleteRow');
         params.append('hn', hn);
+        params.append('date', orderDate); // ส่งวันที่ไปยัง Google Apps Script
+
         await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: params });
         setTimeout(() => { alert("✅ Off TPN เรียบร้อยแล้ว"); fetchOrders(); }, 1000);
       } catch (e) { alert("❌ เกิดข้อผิดพลาด"); btn.innerHTML = originalText; btn.disabled = false; }
